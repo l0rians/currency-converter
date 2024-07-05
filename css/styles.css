@@ -68,3 +68,9 @@ h1 {
 .buttons:hover {
   background-color: #45a049;
 }
+label,
+input,
+button {
+  display: block;
+  margin-bottom: 20px;
+}
