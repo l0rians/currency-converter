@@ -2,12 +2,7 @@
 let currencyRates = [];
 
 // function  to show message
-function displayMessage(message, isSuccess) {
-  // if no parameter given then it would be true by default
-  if (typeof isSuccess === "undefined") {
-    isSuccess = true;
-  }
-
+function displayMessage(message, isSuccess = true) {
   const messageDiv = document.getElementById("message");
   messageDiv.textContent = message;
 
@@ -33,11 +28,13 @@ function handleAddRateForm(event) {
   // Get the value of the base currency from the input field
   const baseCurrency = document
     .getElementById("base-currency")
+    .value.trim()
     .value.toUpperCase();
 
   // Get the value of the target currency from the input field
   const targetCurrency = document
     .getElementById("target-currency")
+    .value.trim()
     .value.toUpperCase();
 
   // Get the value of the exchange rate from the input field and convert it to a float
@@ -83,10 +80,14 @@ function handleConvertForm(event) {
   // Get the value of the from currency from the input field
   const fromCurrency = document
     .getElementById("from-currency")
+    .value.trim()
     .value.toUpperCase();
 
   // Get the value of the to currency from the input field
-  const toCurrency = document.getElementById("to-currency").value.toUpperCase();
+  const toCurrency = document
+    .getElementById("to-currency")
+    .value.trim()
+    .value.toUpperCase();
 
   // Find the rate object for the from currency
   const rateObject = currencyRates.find((rate) => rate.base === fromCurrency);
@@ -125,11 +126,13 @@ function handleUpdateRateForm(event) {
   // Get the value of the base currency from the input field
   const baseCurrency = document
     .getElementById("update-base-currency")
+    .value.trim()
     .value.toUpperCase();
 
   // Get the value of the target currency from the input field
   const targetCurrency = document
     .getElementById("update-target-currency")
+    .value.trim()
     .value.toUpperCase();
 
   // Get the value of the new exchange rate from the input field and convert it to a float
