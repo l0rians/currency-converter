@@ -5,9 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Converter</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <h1>Currency Converter!</h1>
+    <h1>Currency Converter App! V.1.1</h1>
+
+    <div id="message"></div>
+
+    <div class="forms-container">
+      <!-- form for adding a new exchange rate -->
+      <form class="form" id="add-rate-form">
+        <h2>Add new exchange rate</h2>
+        <label for="base-currency">Base Currency:</label>
+        <input type="text" id="base-currency" name="base-currency" required />
+
+        <label for="target-currency">Target Currency:</label>
+        <input
+          type="text"
+          id="target-currency"
+          name="target-currency"
+          required
+        />
+
+        <label for="exchange-rate">Exchange Rate:</label>
+        <input
+          type="number"
+          id="exchange-rate"
+          name="exchange-rate"
+          step="0.001"
+          min="0"
+          required
+        />
+
+        <button class="buttons" type="submit">Add Currency</button>
+      </form>
+
+      <!-- form for converting currency -->
+      <form class="form" id="convert-form">
+        <h2>Convert currency</h2>
+        <label for="from-currency">From Currency:</label>
+        <input type="text" id="from-currency" name="from-currency" required />
+
+        <label for="to-currency">To Currency:</label>
+        <input type="text" id="to-currency" name="to-currency" required />
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" required />
+
+        <button class="buttons" type="submit">Convert</button>
+      </form>
+
+      <!-- form for updating existing exchange rate -->
+      <form class="form" id="update-rate-form">
+        <h2>Update existing exchange rate</h2>
+        <label for="update-base-currency">Base Currency:</label>
+        <input
+          type="text"
+          id="update-base-currency"
+          name="update-base-currency"
+          required
+        />
+
+        <label for="update-target-currency">Target Currency:</label>
+        <input
+          type="text"
+          id="update-target-currency"
+          name="update-target-currency"
+          required
+        />
+
+        <label for="update-exchange-rate">New Exchange Rate:</label>
+        <input
+          type="number"
+          id="update-exchange-rate"
+          name="update-exchange-rate"
+          step="0.001"
+          min="0"
+          required
+        />
+
+        <button class="buttons" type="submit">Update Rate</button>
+      </form>
+    </div>
     <script src="js/app.js"></script>
   </body>
 </html>
