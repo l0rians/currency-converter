@@ -211,6 +211,9 @@ function handleUpdateRateForm(event) {
   displayMessage(
     `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
   );
+  console.log(
+    `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
+  );
 }
 
 // Function to handle search form
@@ -240,6 +243,7 @@ function handleSearchForm(event) {
     searchResult.textContent = `Exchange rate from ${fromCurrency} to ${toCurrency} not found.`;
     searchResult.style.color = "red";
   }
+  console.log(`1 ${fromCurrency} = ${rate.exchangeRate} ${toCurrency}`);
 
   // Remove the search result after 5 seconds
   setTimeout(function () {
