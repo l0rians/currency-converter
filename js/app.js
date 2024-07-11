@@ -1,3 +1,16 @@
+// Added handler events to check input in the "base currency" and "target currency" fields
+document
+  .getElementById("base-currency")
+  .addEventListener("input", validateCurrencyInput);
+document
+  .getElementById("target-currency")
+  .addEventListener("input", validateCurrencyInput);
+// Function for checking input, only allows letters
+function validateCurrencyInput(event) {
+  const input = event.target;
+  input.value = input.value.replace(/[^a-zA-Z]/g, "");
+}
+
 // Array to store currency rates
 let currencyRates = [];
 
