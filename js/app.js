@@ -1,3 +1,30 @@
+// Added handler events to check input in the "base currency" and "target currency" fields
+document
+  .getElementById("base-currency")
+  .addEventListener("input", validateCurrencyInput);
+document
+  .getElementById("target-currency")
+  .addEventListener("input", validateCurrencyInput);
+// Function for checking input, only allows letters
+function validateCurrencyInput(event) {
+  const input = event.target;
+  input.value = input.value.replace(/[^a-zA-Z]/g, "");
+}
+
+// Function to find a currency rate in the currencyRates array
+
+function findCurrencyRate(baseCurrency, targetCurrency, isSearch) {
+  const rate = currencyRates.find((rate) =>
+    isSearch
+      ? rate.baseCurrency === baseCurrency ||
+        rate.targetCurrency === targetCurrency
+      : rate.baseCurrency === baseCurrency &&
+        rate.targetCurrency === targetCurrency
+  );
+
+  return rate ? rate : null;
+}
+
 // Array to store currency rates
 let currencyRates = [];
 
@@ -15,7 +42,7 @@ function displayMessage(message, isSuccess = true) {
 
   messageDiv.style.fontWeight = "bold";
 
-  // after 3 seconds removing message
+  // after 5 seconds removing message
   setTimeout(function () {
     messageDiv.textContent = "";
   }, 3000);
@@ -37,45 +64,66 @@ function handleAddRateForm(event) {
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the exchange rate from the input field and convert it to a float
+  // Get the value of the exchange rate from the input field
   const exchangeRate = parseFloat(
     document.getElementById("exchange-rate").value
   );
 
-  // Find the rate object for the base currency, or create a new one if it doesn't exist
-  let rateObject = currencyRates.find((rate) => rate.base === baseCurrency);
+  // Find an existing rate if it exists
+  const existingRate = findCurrencyRate(baseCurrency, targetCurrency, false);
 
-  if (!rateObject) {
-    // If no rate object is found for the base currency
-    rateObject = {
-      // Create a new rate object
-      timestamp: Date.now(), // Current timestamp
-      base: baseCurrency, // Set the base currency
-      date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
-      rates: {}, // Initialize an empty rates object
-    };
-    currencyRates.push(rateObject); // Add the new rate object to the currencyRates array
+  // If the rate exists, show an error message
+  if (existingRate) {
+    displayMessage(
+      `Exchange rate from ${baseCurrency} to ${targetCurrency} already exists.`,
+      false
+    );
+    return;
   }
 
-  // Add or update the exchange rate for the target currency
-  rateObject.rates[targetCurrency] = exchangeRate;
+  // Add the new rate to the currencyRates array
+  currencyRates.push({ baseCurrency, targetCurrency, exchangeRate });
 
-  // Log the current exchange rates array to the console
-  console.log("Current exchange rates:", currencyRates);
+  // Reset the form fields
+  event.target.reset();
 
-  // Clear the form after submission
-  document.getElementById("add-rate-form").reset();
+  // Update the displayed rates
+  renderCurrencyGrid();
 
-  // Display success message
-  displayMessage("Currency successfully added!", true);
+  // Show success message
+  displayMessage(
+    `Exchange rate from ${baseCurrency} to ${targetCurrency} added successfully!`
+  );
+  console.log(
+    `Exchange rate from ${baseCurrency} to ${targetCurrency} added successfully!`
+  );
+}
+
+// Function to update the rates display
+function renderCurrencyGrid() {
+  const currencyGrid = document.getElementById("currency-grid");
+
+  // Clear the existing content
+  currencyGrid.innerHTML = "";
+
+  // Loop through each rate and add it to the grid
+  currencyRates.forEach((rate) => {
+    const rateItem = document.createElement("div");
+    rateItem.classList.add("rate-item");
+
+    rateItem.innerHTML = `
+      <p><strong>Base Currency:</strong> ${rate.baseCurrency}</p>
+      <p><strong>Target Currency:</strong> ${rate.targetCurrency}</p>
+      <p><strong>Exchange Rate:</strong> ${rate.exchangeRate}</p>
+    `;
+
+    currencyGrid.appendChild(rateItem);
+  });
 }
 
 // Function for converting currency
 function handleConvertForm(event) {
-  event.preventDefault(); // Prevent the default form submission behavior
-
-  // Get the amount to convert from the input field and convert it to a float
-  const amount = parseFloat(document.getElementById("amount").value);
+  event.preventDefault();
 
   // Get the value of the from currency from the input field
   const fromCurrency = document
@@ -89,39 +137,48 @@ function handleConvertForm(event) {
     .value.trim()
     .toUpperCase();
 
-  // Find the rate object for the from currency
-  const rateObject = currencyRates.find((rate) => rate.base === fromCurrency);
+  // Get the value of the amount from the input field
+  const amount = parseFloat(document.getElementById("amount").value);
 
-  if (rateObject && rateObject.rates[toCurrency]) {
-    // If the rate object and the exchange rate for the to currency are found
-    const exchangeRate = rateObject.rates[toCurrency]; // Get the exchange rate for the to currency
-    const convertedAmount = amount * exchangeRate; // Calculate the converted amount
+  // Find the rate
+  const rate = findCurrencyRate(fromCurrency, toCurrency, false);
 
-    // Log the conversion result to the console
-    console.log(
-      `Conversion: ${amount} ${fromCurrency} to ${convertedAmount.toFixed(
+  // Find the reverse rate (toCurrency to fromCurrency)
+  const reverseRate = findCurrencyRate(toCurrency, fromCurrency);
+
+  // Calculate the converted amount
+  let convertedAmount;
+  if (rate) {
+    convertedAmount = amount * rate.exchangeRate;
+    displayMessage(
+      `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(
         2
       )} ${toCurrency}`
     );
-
-    // Display success message
+  } else if (reverseRate) {
+    convertedAmount = amount / reverseRate.exchangeRate;
     displayMessage(
-      `Conversion: ${amount} ${fromCurrency} to ${convertedAmount.toFixed(
+      `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(
         2
       )} ${toCurrency}`
     );
   } else {
-    // If no rate is found for the conversion
-    console.log("No rate found for this conversion");
-
-    // Display error message
-    displayMessage("No rate found for this conversion", false);
+    displayMessage(
+      `Exchange rate from ${fromCurrency} to ${toCurrency} not found.`,
+      false
+    );
   }
+
+  console.log(
+    `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(
+      2
+    )} ${toCurrency}`
+  );
 }
 
-// Function for updating existing exchange rate
+// Function for updating an existing rate
 function handleUpdateRateForm(event) {
-  event.preventDefault(); // Prevent the default form submission behavior
+  event.preventDefault();
 
   // Get the value of the base currency from the input field
   const baseCurrency = document
@@ -135,42 +192,107 @@ function handleUpdateRateForm(event) {
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the new exchange rate from the input field and convert it to a float
+  // Get the value of the new exchange rate from the input field
   const newExchangeRate = parseFloat(
     document.getElementById("update-exchange-rate").value
   );
 
-  // Find the rate object for the base currency
-  const rateObject = currencyRates.find((rate) => rate.base === baseCurrency);
+  // Find the rate
+  const rate = findCurrencyRate(baseCurrency, targetCurrency, false);
 
-  if (rateObject && rateObject.rates[targetCurrency]) {
-    // If the rate object and the exchange rate for the target currency are found
-    rateObject.rates[targetCurrency] = newExchangeRate; // Update the exchange rate
-
-    // Log the updated exchange rates array to the console
-    console.log("Updated exchange rates:", currencyRates);
-
-    // Display success message
-    displayMessage("Exchange rate successfully updated!", true);
-  } else {
-    // If no rate is found for the update
-    console.log("Rate not found. Please add it first.");
-
-    // Display error message
-    displayMessage("Rate not found. Please add it first.", false);
+  // If rate not found, show an error message
+  if (!rate) {
+    displayMessage(
+      `Exchange rate from ${baseCurrency} to ${targetCurrency} not found.`,
+      false
+    );
+    return;
   }
 
-  // Clear the form after submission
-  document.getElementById("update-rate-form").reset();
+  // Update the rate
+  rate.exchangeRate = newExchangeRate;
+
+  // Reset the form fields
+  event.target.reset();
+
+  // Update the displayed rates
+  renderCurrencyGrid();
+
+  // Show success message
+  displayMessage(
+    `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
+  );
+  console.log(
+    `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
+  );
 }
 
-// Add event listeners to the forms after the page loads
+// Function to handle search form
+function handleSearchForm(event) {
+  event.preventDefault();
+
+  const fromCurrency = document
+    .getElementById("search-from")
+    .value.trim()
+    .toUpperCase();
+  const toCurrency = document
+    .getElementById("search-to")
+    .value.trim()
+    .toUpperCase();
+
+  // Find the rate using the new function
+  let ratesList = [];
+  if (fromCurrency && toCurrency) {
+    ratesList.push(findCurrencyRate(fromCurrency, toCurrency, true));
+  } else if (fromCurrency && !toCurrency) {
+    ratesList = currencyRates.filter(
+      (rate) => rate.baseCurrency === fromCurrency
+    );
+  } else {
+    ratesList = currencyRates
+      .filter((rate) => rate.targetCurrency === toCurrency)
+      .map((rate) => ({
+        baseCurrency: rate.targetCurrency,
+        exchangeRate: (1 / rate.exchangeRate).toFixed(2),
+        targetCurrency: rate.baseCurrency,
+      }));
+  }
+  let text = "";
+  for (const rate of ratesList) {
+    console.log(rate);
+    text += `1 ${rate.baseCurrency} = ${rate.exchangeRate} ${rate.targetCurrency}\n`;
+  }
+
+  const searchResult = document.getElementById("search-result");
+
+  if (ratesList.length) {
+    searchResult.innerHTML = text;
+    searchResult.style.color = "green";
+  } else {
+    searchResult.innerHTML = `Exchange rate from ${fromCurrency} to ${toCurrency} not found.`;
+    searchResult.style.color = "red";
+  }
+
+  // Remove the search result after 3 seconds
+  setTimeout(function () {
+    console.log(searchResult);
+    searchResult.innerHTML = "";
+  }, 30000);
+}
+
+// Adding event listeners to forms
 document
   .getElementById("add-rate-form")
   .addEventListener("submit", handleAddRateForm);
+
 document
   .getElementById("convert-form")
   .addEventListener("submit", handleConvertForm);
+
 document
   .getElementById("update-rate-form")
   .addEventListener("submit", handleUpdateRateForm);
+
+document
+  .getElementById("search-form")
+  .addEventListener("submit", handleSearchForm);
