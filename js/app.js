@@ -245,11 +245,11 @@ function handleSearchForm(event) {
   if (fromCurrency && toCurrency) {
     ratesList.push(findCurrencyRate(fromCurrency, toCurrency, true));
   } else if (fromCurrency && !toCurrency) {
-    ratesList = [...currencyRates].filter(
+    ratesList = currencyRates.filter(
       (rate) => rate.baseCurrency === fromCurrency
     );
   } else {
-    ratesList = [...currencyRates]
+    ratesList = currencyRates
       .filter((rate) => rate.targetCurrency === toCurrency)
       .map((rate) => ({
         baseCurrency: rate.targetCurrency,
