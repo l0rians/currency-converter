@@ -13,16 +13,22 @@ function validateCurrencyInput(event) {
 }
 
 // Function to find a currency rate in the currencyRates array
-function findCurrencyRate(baseCurrency, targetCurrency, isSearch) {
-  const rate = currencyRates.find((rate) =>
-    isSearch
-      ? rate.baseCurrency === baseCurrency ||
+function findCurrencyRate(baseCurrency, targetCurrency, isSearch = false) {
+  if (isSearch) {
+    return currencyRates.find(
+      (rate) =>
+        (rate.baseCurrency === baseCurrency &&
+          rate.targetCurrency === targetCurrency) ||
+        (rate.baseCurrency === targetCurrency &&
+          rate.targetCurrency === baseCurrency)
+    );
+  } else {
+    return currencyRates.find(
+      (rate) =>
+        rate.baseCurrency === baseCurrency &&
         rate.targetCurrency === targetCurrency
-      : rate.baseCurrency === baseCurrency &&
-        rate.targetCurrency === targetCurrency
-  );
-
-  return rate ? rate : null;
+    );
+  }
 }
 
 // Array to store currency rates
@@ -318,3 +324,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Start checking market status
   checkMarketStatus();
 });
+
+console.log(currencyRates);
