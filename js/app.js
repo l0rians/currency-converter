@@ -5,6 +5,7 @@ document
 document
   .getElementById("target-currency")
   .addEventListener("input", validateCurrencyInput);
+
 // Function for checking input, only allows letters
 function validateCurrencyInput(event) {
   const input = event.target;
@@ -12,37 +13,37 @@ function validateCurrencyInput(event) {
 }
 
 // Function to find a currency rate in the currencyRates array
-
-function findCurrencyRate(baseCurrency, targetCurrency, isSearch) {
-  const rate = currencyRates.find((rate) =>
-    isSearch
-      ? rate.baseCurrency === baseCurrency ||
+function findCurrencyRate(baseCurrency, targetCurrency, isSearch = false) {
+  if (isSearch) {
+    return currencyRates.find(
+      (rate) =>
+        (rate.baseCurrency === baseCurrency &&
+          rate.targetCurrency === targetCurrency) ||
+        (rate.baseCurrency === targetCurrency &&
+          rate.targetCurrency === baseCurrency)
+    );
+  } else {
+    return currencyRates.find(
+      (rate) =>
+        rate.baseCurrency === baseCurrency &&
         rate.targetCurrency === targetCurrency
-      : rate.baseCurrency === baseCurrency &&
-        rate.targetCurrency === targetCurrency
-  );
-
-  return rate ? rate : null;
+    );
+  }
 }
 
 // Array to store currency rates
 let currencyRates = [];
 
-// function  to show message
+// Function to show message
 function displayMessage(message, isSuccess = true) {
   const messageDiv = document.getElementById("message");
   messageDiv.textContent = message;
 
-  // Setting color if succes it will be green if error - red
-  if (isSuccess) {
-    messageDiv.style.color = "green";
-  } else {
-    messageDiv.style.color = "red";
-  }
-
+  // Setting color: green for success, red for error
+  messageDiv.style.color = isSuccess ? "green" : "red";
   messageDiv.style.fontWeight = "bold";
 
-  // after 5 seconds removing message
+  // Clear message after 3 seconds
   setTimeout(function () {
     messageDiv.textContent = "";
   }, 3000);
@@ -50,29 +51,29 @@ function displayMessage(message, isSuccess = true) {
 
 // Function for adding a new exchange rate
 function handleAddRateForm(event) {
-  event.preventDefault(); // Prevent the default form submission behavior
+  event.preventDefault(); // Prevent default form submission
 
-  // Get the value of the base currency from the input field
+  // Get base currency value
   const baseCurrency = document
     .getElementById("base-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the target currency from the input field
+  // Get target currency value
   const targetCurrency = document
     .getElementById("target-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the exchange rate from the input field
+  // Get exchange rate value
   const exchangeRate = parseFloat(
     document.getElementById("exchange-rate").value
   );
 
-  // Find an existing rate if it exists
+  // Check if rate already exists
   const existingRate = findCurrencyRate(baseCurrency, targetCurrency, false);
 
-  // If the rate exists, show an error message
+  // Show error if rate exists
   if (existingRate) {
     displayMessage(
       `Exchange rate from ${baseCurrency} to ${targetCurrency} already exists.`,
@@ -81,32 +82,27 @@ function handleAddRateForm(event) {
     return;
   }
 
-  // Add the new rate to the currencyRates array
+  // Add new rate to currencyRates array
   currencyRates.push({ baseCurrency, targetCurrency, exchangeRate });
 
-  // Reset the form fields
+  // Reset form fields
   event.target.reset();
 
-  // Update the displayed rates
+  // Update displayed rates
   renderCurrencyGrid();
 
   // Show success message
   displayMessage(
     `Exchange rate from ${baseCurrency} to ${targetCurrency} added successfully!`
   );
-  console.log(
-    `Exchange rate from ${baseCurrency} to ${targetCurrency} added successfully!`
-  );
 }
 
-// Function to update the rates display
+// Function to update displayed rates
 function renderCurrencyGrid() {
   const currencyGrid = document.getElementById("currency-grid");
+  currencyGrid.innerHTML = ""; // Clear existing content
 
-  // Clear the existing content
-  currencyGrid.innerHTML = "";
-
-  // Loop through each rate and add it to the grid
+  // Loop through rates and add to grid
   currencyRates.forEach((rate) => {
     const rateItem = document.createElement("div");
     rateItem.classList.add("rate-item");
@@ -125,28 +121,28 @@ function renderCurrencyGrid() {
 function handleConvertForm(event) {
   event.preventDefault();
 
-  // Get the value of the from currency from the input field
+  // Get from currency value
   const fromCurrency = document
     .getElementById("from-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the to currency from the input field
+  // Get to currency value
   const toCurrency = document
     .getElementById("to-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the amount from the input field
+  // Get amount value
   const amount = parseFloat(document.getElementById("amount").value);
 
-  // Find the rate
+  // Find rate
   const rate = findCurrencyRate(fromCurrency, toCurrency, false);
 
-  // Find the reverse rate (toCurrency to fromCurrency)
+  // Find reverse rate
   const reverseRate = findCurrencyRate(toCurrency, fromCurrency);
 
-  // Calculate the converted amount
+  // Calculate converted amount
   let convertedAmount;
   if (rate) {
     convertedAmount = amount * rate.exchangeRate;
@@ -168,39 +164,33 @@ function handleConvertForm(event) {
       false
     );
   }
-
-  console.log(
-    `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(
-      2
-    )} ${toCurrency}`
-  );
 }
 
-// Function for updating an existing rate
+// Function for updating existing rate
 function handleUpdateRateForm(event) {
   event.preventDefault();
 
-  // Get the value of the base currency from the input field
+  // Get base currency value
   const baseCurrency = document
     .getElementById("update-base-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the target currency from the input field
+  // Get target currency value
   const targetCurrency = document
     .getElementById("update-target-currency")
     .value.trim()
     .toUpperCase();
 
-  // Get the value of the new exchange rate from the input field
+  // Get new exchange rate value
   const newExchangeRate = parseFloat(
     document.getElementById("update-exchange-rate").value
   );
 
-  // Find the rate
+  // Find rate
   const rate = findCurrencyRate(baseCurrency, targetCurrency, false);
 
-  // If rate not found, show an error message
+  // Show error if rate not found
   if (!rate) {
     displayMessage(
       `Exchange rate from ${baseCurrency} to ${targetCurrency} not found.`,
@@ -209,38 +199,38 @@ function handleUpdateRateForm(event) {
     return;
   }
 
-  // Update the rate
+  // Update rate
   rate.exchangeRate = newExchangeRate;
 
-  // Reset the form fields
+  // Reset form fields
   event.target.reset();
 
-  // Update the displayed rates
+  // Update displayed rates
   renderCurrencyGrid();
 
   // Show success message
   displayMessage(
     `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
   );
-  console.log(
-    `Exchange rate from ${baseCurrency} to ${targetCurrency} updated successfully!`
-  );
 }
 
-// Function to handle search form
+// Function for handling search form
 function handleSearchForm(event) {
   event.preventDefault();
 
+  // Get from currency value
   const fromCurrency = document
     .getElementById("search-from")
     .value.trim()
     .toUpperCase();
+
+  // Get to currency value
   const toCurrency = document
     .getElementById("search-to")
     .value.trim()
     .toUpperCase();
 
-  // Find the rate using the new function
+  // Find rate using updated function
   let ratesList = [];
   if (fromCurrency && toCurrency) {
     ratesList.push(findCurrencyRate(fromCurrency, toCurrency, true));
@@ -257,14 +247,15 @@ function handleSearchForm(event) {
         targetCurrency: rate.baseCurrency,
       }));
   }
+
+  // Prepare search result text
   let text = "";
   for (const rate of ratesList) {
-    console.log(rate);
     text += `1 ${rate.baseCurrency} = ${rate.exchangeRate} ${rate.targetCurrency}\n`;
   }
 
+  // Display search result or error message
   const searchResult = document.getElementById("search-result");
-
   if (ratesList.length) {
     searchResult.innerHTML = text;
     searchResult.style.color = "green";
@@ -273,11 +264,10 @@ function handleSearchForm(event) {
     searchResult.style.color = "red";
   }
 
-  // Remove the search result after 3 seconds
+  // Remove search result after 5 seconds
   setTimeout(function () {
-    console.log(searchResult);
     searchResult.innerHTML = "";
-  }, 30000);
+  }, 5000);
 }
 
 // Adding event listeners to forms
@@ -296,3 +286,43 @@ document
 document
   .getElementById("search-form")
   .addEventListener("submit", handleSearchForm);
+
+// Function for announcing market status
+function marketStatusAnnouncement() {
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  // Market opening and closing times
+  const marketOpenHour = 9; // 9AM
+  const marketCloseHour = 17; // 5PM
+
+  // Check current hour and display status
+  if (currentHour >= marketOpenHour && currentHour < marketCloseHour) {
+    displayMarketStatus("Market is currently open!", "open");
+  } else {
+    displayMarketStatus("Market is currently closed.", "closed");
+  }
+}
+
+// Function to display market status on the page
+function displayMarketStatus(message, statusClass) {
+  const marketStatusElement = document.getElementById("market-status");
+  marketStatusElement.textContent = message;
+  marketStatusElement.className = "status " + statusClass;
+}
+
+// Function to check time and announce market status
+function checkMarketStatus() {
+  marketStatusAnnouncement(); // Check status immediately on page load
+
+  // Schedule the check every minute afterwards
+  setInterval(marketStatusAnnouncement, 60000); // Check every minute
+}
+
+// Start checking market status when the page is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Start checking market status
+  checkMarketStatus();
+});
+
+console.log(currencyRates);
