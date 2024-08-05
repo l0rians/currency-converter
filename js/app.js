@@ -6,6 +6,25 @@ document
   .getElementById("target-currency")
   .addEventListener("input", validateCurrencyInput);
 
+// Fetches the latest currency rates from a remote JSON file and updates the currency grid
+async function fetchCurrencyRates() {
+  try {
+    const response = await fetch(
+      "https://raw.githubusercontent.com/l0rians/l0rians.github.io/main/data/currency-rates.json"
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok " + response.statusText);
+    }
+    const data = await response.json();
+    currencyRates = data;
+    renderCurrencyGrid();
+  } catch (error) {
+    console.error("There has been a problem with your fetch operation:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", fetchCurrencyRates);
+
 // Function for checking input, only allows letters
 function validateCurrencyInput(event) {
   const input = event.target;
