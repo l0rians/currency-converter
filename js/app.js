@@ -15,7 +15,8 @@ async function fetchCurrencyRates() {
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }
-    currencyRates = await response.json();
+    const data = await response.json();
+    currencyRates = data;
     renderCurrencyGrid();
   } catch (error) {
     console.error("There has been a problem with your fetch operation:", error);
