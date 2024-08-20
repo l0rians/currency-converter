@@ -344,4 +344,8 @@ document.addEventListener("DOMContentLoaded", () => {
   checkMarketStatus();
 });
 
-console.log(currencyRates);
+document.getElementById("reset-button").addEventListener("click", () => {
+  currencyRates = []; // clear the array of exchange rates
+  renderCurrencyGrid(); // re-render the currency grid
+  alert("Exchange rates have been reset."); // alert the user
+});

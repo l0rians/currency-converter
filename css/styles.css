@@ -73,6 +73,17 @@ h1 {
   transition: background-color 0.3s;
 }
 
+#reset-button {
+  background-color: #f44336;
+  margin-top: 20px;
+  margin: auto;
+  padding: 15px 20px;
+  border-radius: 40px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
 .buttons:hover {
   background-color: #45a049;
   transform: scale(1.1);
