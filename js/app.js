@@ -254,16 +254,18 @@ function handleSearchForm(event) {
   if (fromCurrency && toCurrency) {
     ratesList.push(findCurrencyRate(fromCurrency, toCurrency, true));
   } else if (fromCurrency && !toCurrency) {
+    // If only from currency is provided, search for all target currencies
     ratesList = currencyRates.filter(
       (rate) => rate.baseCurrency === fromCurrency
     );
-  } else {
+  } else if (!fromCurrency && toCurrency) {
+    // If only to currency is provided, search for all base currencies
     ratesList = currencyRates
       .filter((rate) => rate.targetCurrency === toCurrency)
       .map((rate) => ({
-        baseCurrency: rate.targetCurrency,
-        exchangeRate: (1 / rate.exchangeRate).toFixed(2),
-        targetCurrency: rate.baseCurrency,
+        baseCurrency: rate.baseCurrency,
+        exchangeRate: rate.exchangeRate,
+        targetCurrency: rate.targetCurrency,
       }));
   }
 
