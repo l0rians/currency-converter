@@ -62,10 +62,10 @@ function displayMessage(message, isSuccess = true) {
   messageDiv.style.color = isSuccess ? "green" : "red";
   messageDiv.style.fontWeight = "bold";
 
-  // Clear message after 3 seconds
+  // Clear message after 10 seconds
   setTimeout(function () {
     messageDiv.textContent = "";
-  }, 3000);
+  }, 10000);
 }
 
 // Function for adding a new exchange rate
@@ -283,10 +283,10 @@ function handleSearchForm(event) {
     searchResult.style.color = "red";
   }
 
-  // Remove search result after 5 seconds
+  // Remove search result after 10 seconds
   setTimeout(function () {
     searchResult.innerHTML = "";
-  }, 5000);
+  }, 10000);
 }
 
 // Adding event listeners to forms
