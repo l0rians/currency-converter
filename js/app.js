@@ -30,7 +30,7 @@ function validateCurrencyInput(event) {
   const input = event.target;
   input.value = input.value.replace(/[^a-zA-Z]/g, "");
 }
-
+// asdasdasdasdasdasd
 // Function to find a currency rate in the currencyRates array
 function findCurrencyRate(baseCurrency, targetCurrency, isSearch = false) {
   if (isSearch) {
